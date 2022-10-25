@@ -1,0 +1,105 @@
+---
+title: "COGS_score_contributions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(data.table)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/COGS_results")
+
+```
+
+## Here is how to define genes that are specific to ILC3s, based on PIRs:
+1) find the genes that are prioritised in hILC3s
+2) Filter for the genes that require PIRs (or ABC enhancers) to be prioritised. This will be everything that is in the whole dataset that is not VProm+CodingOnly. 
+3) find the genes that are prioritised in Javierre across all cell types.
+4) Filter for those that require PIRs (i.e. everything not in VProm, coding again)
+5) Make a table between the "ILC3 PIRs" genes and the "Javierre PIRs" genes.
+6) Make another column of "ILC3 PIRs" genes that are also prioritised by VProm_coding only in Javierre. These are the ones prioritised by VProm because of HindIII.
+
+#####
+points 1 and 2.
+
+```{r Get PIR genes in ILC3s  - this data is for frag res, 5kb and ABC interactions}
+AI <- fread("./COGS_out/CD_deLange_ILCs_hg38_SuSIE_combinedInteractions_ALL/Annotated_COGS_scores_data.table.txt")
+AV <- fread("./COGS_out/CD_deLange_ILCs_hg38_SuSIE_combinedInteractions_VProm_coding_only/Annotated_COGS_scores_data.table.txt") 
+
+setnames(AI, "cogs", "cogs_total")
+setnames(AV, "cogs", "cogs_VProm_coding")
+
+AI_sig <- AI[cogs_total >= 0.5]
+AV_bind <- AV[, .(ensg, cogs_VProm_coding)]
+
+AI_AV <- AV_bind[AI_sig, on = "ensg"]
+AI_AV[is.na(cogs_VProm_coding)] # none
+
+PIRs_req <- AI_AV[cogs_VProm_coding < 0.5] 
+PIRs_req[, ILC3_PIRs := "yes"]
+
+
+```
+
+####
+Points 3 and 4.
+
+
+```{r get PIR genes in Javierre}
+J <- fread("./COGS_out/CD_deLange_Javierre_hg38_SuSIE_allCells/Annotated_COGS_scores_data.table_cell_type_summary_hg38.txt") # these are all the significant ones in Javierre in at least one cell type. Was re-run in hg38 using the hg38 rmap and baitmap.
+JP <- fread("./COGS_out/CD_deLange_Javierre_hg38_SuSIE_allCells_VProm_coding_only/Annotated_COGS_scores_data.table.txt") # these are the ones that have been run on VProm Coding alone.
+
+setnames(JP, "cogs", "cogs_VProm_coding")
+
+JP_bind <- JP[, .(ensg, cogs_VProm_coding)]
+
+J_JP <- JP_bind[J, on = "ensg"]
+J_JP[is.na(cogs_VProm_coding)] 
+
+PIRs_req_Jav <- J_JP[cogs_VProm_coding < 0.5] 
+PIRs_req_Jav[, BLOOD_PIRs := "yes"]
+
+
+```
+
+points 5 and 6.
+
+```{r merge ILC3s with Javierre}
+PIRs_req_Jav_small <- PIRs_req_Jav[, .(ensg, BLOOD_PIRs)]
+
+I_J1 <- PIRs_req_Jav_small[PIRs_req, on = "ensg"]
+
+# Get the ones prioritised by VPromCoding in Javierre
+JP_sig <- JP[cogs_VProm_coding >= 0.5]
+JP_sig[, "BLOOD_VProm_Coding_alone" := "yes"] 
+JP_sig_small <- JP_sig[, .(ensg, BLOOD_VProm_Coding_alone)]
+
+I_J2 <- JP_sig_small[I_J1, on = "ensg"]
+I_J2[is.na(I_J2)] <- "no"
+
+final <- I_J2[, .(ensg, gene, cogs_total, ILC3_PIRs, BLOOD_PIRs, BLOOD_VProm_Coding_alone)]
+setnames(final, c("cogs_total", "BLOOD_VProm_Coding_alone"), c("ILC3s_overall_COGS_score", "BLOOD_Promoter"))
+
+
+```
+
+Write the file. Get a col of prev prior evidence for these genes.
+
+```{R write results}
+
+prior <- fread("./COGS_out/CD_deLange_ILCs_hg38_SuSIE_combinedInteractions_ALL/Annotated_COGS_scores_data.table_with_prior_info_SuSIE_combinedInteractions.txt")
+prior2 <- prior[, c("ensg", "Prior evidence")]
+prior2[`Prior evidence` == "", prior := "no"]
+prior2[`Prior evidence` != "", prior := "yes"]
+prior2[, `Prior evidence` := NULL]
+final_wprior <- final[prior2, on = "ensg", nomatch = NULL]
+
+setnames(final_wprior, c("ILC3s_overall_COGS_score", "ILC3_PIRs", "BLOOD_PIRs", "BLOOD_Promoter", "prior"), c("ILC3s multiCOGS score", "Prioritised based on ILC3 PIRs", "Prioritised based on Javierre PIRs", "BLOOD_Promoter", "Prior mechanistic evidence in CD"))
+
+out = "./comparisons/ILC_Javierre_PIR_analysis.txt"
+fwrite(final_wprior, file = out, sep = "\t", quote = F, row.names = F, col.names = T)
+
+
+
+```
