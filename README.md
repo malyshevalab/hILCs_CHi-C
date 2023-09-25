@@ -7,6 +7,9 @@ Analysis of alternative isoform interactions in hILC PCHiC data.
 ### COGS_score_contributions_PIR_analysis.Rmd
 Comparison between ILC3 COGS genes and other blood type COGS genes that required CHi-C PIRs for prioritisation.
 
+### classicCOGS_vs_impute_vsSuSIE.ipynb
+Comparison between classic COGS, imputation and SuSIE. Also, production of heatmaps comparing the genomic regions underlying COGS signals.
+
 ### COGS_clusterProfiler_final.R
 Run GO term / GSEA analysis on COGS results.
 
