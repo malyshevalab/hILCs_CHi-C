@@ -1,15 +1,18 @@
 # hILCs_CHi-C
 Scripts to accompany Malysheva/Ray-Jones et al., 2022: High-resolution promoter interaction analysis in Type 3 Innate Lymphoid Cells implicates Batten Disease gene CLN3 in Crohn’s Disease aetiology 
 
-### Alt_isoform_analysis_HRJ.R
-Analysis of alternative isoform interactions in hILC PCHiC data.
-
-### COGS_score_contributions_PIR_analysis.Rmd
-Comparison between ILC3 COGS genes and other blood type COGS genes that required CHi-C PIRs for prioritisation.
+### Alternative_isoform_CHi-C_analysis.R
+Analysis of alternative isoform interactions in hILC3 PCHiC data. 
 
 ### classicCOGS_vs_impute_vsSuSIE.ipynb
-Comparison between classic COGS, imputation and SuSIE. Also, production of heatmaps comparing the genomic regions underlying COGS signals.
+- Comparison between different COGS runs (classic, classic + imputation and SuSIE, i.e. full multiCOGS). 
+- Production of heatmaps comparing the features underlying COGS signals.
+- Formatting of supplementary tables
+- Generating UCSC browser tracks of data
 
+### tocheck still - all below
+### Also - 
+### comparison with crispr screen?
 ### COGS_clusterProfiler_final.R
 Run GO term / GSEA analysis on COGS results.
 
