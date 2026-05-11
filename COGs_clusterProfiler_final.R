@@ -11,9 +11,9 @@ library(forcats)
 library(ggplot2)
 library(dplyr)
 
-############################################################################
-####### Find enriched biological functions among our top COGS genes ########
-############################################################################
+###############################################################################
+####### Find enriched biological functions among our top CD COGS genes ########
+###############################################################################
 
 #### Function for running enrichGO from COGs annotated table (not used)
 COGS_enrichGO <- function(cogs, score=0.5) {
@@ -193,3 +193,40 @@ fwrite(gsea_deLange_CD_full, file = "./COGS_out/CD_deLange_ILCs_hg38_ClassicCOGS
 # None were significant
 
 ####### 
+
+# Run using enricher instead.
+COGS_enricher <- function(COGS, score=0.5, dataset) {
+  sig <- COGS[cogs > score]
+  cg <- unique(sig$ensg)
+  GO <- enricher(cg, TERM2GENE = dataset, pvalueCutoff=1, 
+                 maxGSSize = 2000)
+  print(head(GO, 5))
+  #print(dotplot(GO))
+  #print(goplot(GO))
+  return(GO)
+}
+####
+
+GO_susie <- COGS_enricher(cas, score=0.5, keep_same_sets)
+pdf(file = "~/HRJ_monocytes/hILCs/COGS_results/COGS_out/Version3_revision2/revision_deLange_ILCs_hg38_SuSIE_combinedInteractions_extended_ABC023/TAMMA_susie_results_aug2025.pdf")
+print(dotplot(GO_susie))
+dev.off()
+
+GO_susie_full <- as.data.table(GO_susie@result)
+fwrite(GO_susie_full, file = "~/HRJ_monocytes/hILCs/COGS_results/COGS_out/Version3_revision2/revision_deLange_ILCs_hg38_SuSIE_combinedInteractions_extended_ABC023/cogsEnricher_revision_CD_deLange_SuSIE_results.txt", 
+       sep = "\t", quote = F, col.names = T, row.names = F)
+
+
+### Are any significant without SuSIE?
+GO_deLange_CD <- COGS_enricher(cad, score=0.5, keep_same_sets)
+GO_deLange_CD_full <- as.data.table(GO_deLange_CD@result)
+
+pdf(file = "~/HRJ_monocytes/hILCs/COGS_results/COGS_out/Version3_revision2/revision_CD_deLange_ILCs_hg38_ClassicCOGS_combinedInteractions_ALL_extended_ABC023/TAMMA_susie_results_aug2025.pdf")
+print(dotplot(GO_deLange_CD))
+dev.off()
+
+fwrite(GO_deLange_CD_full, file = "~/HRJ_monocytes/hILCs/COGS_results/COGS_out/Version3_revision2/revision_CD_deLange_ILCs_hg38_ClassicCOGS_combinedInteractions_ALL_extended_ABC023/cogsEnricher_CD_results.txt", 
+       sep = "\t", quote = F, col.names = T, row.names = F)
+
+# None were significant
+
