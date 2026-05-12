@@ -1,5 +1,7 @@
 # hILCs_CHi-C
-Scripts to accompany Malysheva/Ray-Jones et al., 2022: High-resolution promoter interaction analysis in Type 3 Innate Lymphoid Cells implicates Batten Disease gene CLN3 in Crohn’s Disease aetiology 
+Analysis scripts and notebooks to accompany Malysheva/Ray-Jones/Lakes et al.,: High-resolution promoter interaction analysis in Type 3 Innate Lymphoid Cells implicates Batten Disease gene CLN3 in Crohn’s Disease aetiology. [Biorxiv, 2022](https://www.biorxiv.org/content/10.1101/2022.10.19.512842v4)
+
+For additional code detailing the multiCOGS runs, see the [multiCOGS repo](https://github.com/FunctionalGeneControl/multiCOGS) in the FunctionalGeneControl Github. 
 
 ### Alternative_isoform_CHi-C_analysis.R
 Analysis of alternative isoform interactions in hILC3 PCHiC data. 
@@ -11,7 +13,7 @@ Analysis of alternative isoform interactions in hILC3 PCHiC data.
 - Generating UCSC browser tracks of data
 
 ### compare_COGS_results_scatterplot.R
-Make a scatterplot comparing the COGS scores for two condiions; here, standard V multiCOGS
+Make a scatterplot comparing the COGS scores for two condiions; here, classic V multiCOGS
 
 ### make_manhattan_oneSample.R
 Generate Manhattan plot for COGS scores per gene
@@ -36,6 +38,7 @@ Explore the RELI disease enrichment results in ILC3 PIRs and look for overrepres
 ### run_Mageck_pathway.sh
 Run the pathway analysis using Mageck to determine enrichment of multiCOGS genes across autoimmune traits (ILC3s) among genes in the IL-22 MNK3 CRISPRi screen (Brown et al., Biorxiv 2025)
 
-### TODO: script for plotting the mageck results.
+### multiTraits_plotted_on_CRISPRiscreen.ipynb
+Plot the multiCOGS genes across autoimmune traits on the IL22 CRISPRi screen results.
 
 
